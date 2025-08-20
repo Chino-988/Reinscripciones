@@ -22,7 +22,7 @@ COPY . .
 # Instala dependencias PHP y JS
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 RUN yarn
-RUN yarn prod
+RUN yarn build
 
 # Cache de Laravel
 RUN php artisan config:cache
