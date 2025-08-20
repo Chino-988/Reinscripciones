@@ -28,7 +28,7 @@ RUN yarn build
 RUN php artisan config:cache
 RUN php artisan route:cache
 RUN php artisan view:cache
-RUN php artisan migrate --force
+#RUN php artisan migrate --force
 
 # Puerto donde corre Laravel
 EXPOSE 8000
