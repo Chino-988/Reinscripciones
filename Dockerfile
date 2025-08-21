@@ -28,9 +28,11 @@ RUN yarn build
 RUN php artisan config:cache
 RUN php artisan route:cache
 RUN php artisan view:cache
+RUN mkdir -p /var/log/laravel
 
 # Expone el puerto (Render lo inyecta como $PORT)
 EXPOSE 8000
 
 # Comando para ejecutar Laravel en Render
-CMD php artisan serve --host=0.0.0.0 --port=${PORT}
+CMD php artisan migrate --force || true && tail -f storage/logs/laravel.log | php artisan serve --host=0.0.0.0 --port=${PORT}
+
