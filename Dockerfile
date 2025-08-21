@@ -1,37 +1,35 @@
-# Imagen base con PHP 8.2
+# Usa PHP 8.2 con extensiones necesarias
 FROM php:8.2-cli
 
-# Instala dependencias
+# Instala dependencias del sistema
 RUN apt-get update && apt-get install -y \
     git curl unzip zip libzip-dev libpng-dev libonig-dev libxml2-dev \
     nodejs npm \
     && docker-php-ext-install pdo_mysql zip gd
 
-# Instala Composer
+# Instala Composer globalmente
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Instala Yarn
 RUN npm install -g yarn
 
-# Establece el directorio de trabajo
+# Establece directorio de trabajo
 WORKDIR /var/www
 
-# Copia tu proyecto al contenedor
+# Copia todo el proyecto
 COPY . .
 
-# Instala dependencias PHP y JS
+# Instala dependencias de PHP y JavaScript
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-RUN yarn
-RUN yarn build
+RUN yarn && yarn build
 
 # Cache de Laravel
-RUN php artisan config:cache
-RUN php artisan route:cache
-RUN php artisan view:cache
-#RUN php artisan migrate --force
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
 
-# Puerto donde corre Laravel
+# Exponer puerto 8000
 EXPOSE 8000
 
-# Comando que ejecuta Laravel
-CMD php artisan serve --host=0.0.0.0 --port=${PORT}
+# Comando final: ejecutar Laravel en el puerto que Railway expone
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=${PORT}"]
