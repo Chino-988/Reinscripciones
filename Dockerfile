@@ -33,4 +33,4 @@ RUN php artisan view:cache
 EXPOSE 8000
 
 # Comando para ejecutar Laravel en Render
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT}
+CMD php artisan serve --host=0.0.0.0 --port=${PORT}
