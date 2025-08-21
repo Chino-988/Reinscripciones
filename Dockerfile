@@ -1,33 +1,36 @@
-# Imagen base
+# Imagen base con PHP 8.2
 FROM php:8.2-cli
 
-# Dependencias necesarias
+# Instala dependencias necesarias
 RUN apt-get update && apt-get install -y \
     git curl unzip zip libzip-dev libpng-dev libonig-dev libxml2-dev \
     nodejs npm \
     && docker-php-ext-install pdo_mysql zip gd
 
-# Composer
+# Instala Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Yarn
+# Instala Yarn
 RUN npm install -g yarn
 
-# Directorio de trabajo
+# Establece el directorio de trabajo
 WORKDIR /var/www
 
-# Copia proyecto
+# Copia tu proyecto al contenedor
 COPY . .
 
-# Instalar dependencias
+# Instala dependencias PHP y JS
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-RUN yarn && yarn build
+RUN yarn
+RUN yarn build
 
-# Caches Laravel
-RUN php artisan config:cache && php artisan route:cache && php artisan view:cache
+# Compila caches de Laravel
+RUN php artisan config:cache
+RUN php artisan route:cache
+RUN php artisan view:cache
 
-# Exponer puerto 8000
+# Expone el puerto (Render lo inyecta como $PORT)
 EXPOSE 8000
 
-# Comando de inicio
-CMD php artisan serve --host=0.0.0.0 --port=$(echo ${PORT} | grep -o '[0-9]*')
+# Comando para ejecutar Laravel en Render
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT}
